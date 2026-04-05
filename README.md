@@ -120,7 +120,7 @@ npm run dev
 npm start
 ```
 
-The API will be running at: **http://localhost:5000**
+The API will be running at: **http://localhost:5001**
 
 ---
 
