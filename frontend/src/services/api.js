@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Base URL — with CRA proxy set to localhost:5000, '/api' works in dev
 const API = axios.create({
-  baseURL: '/api',
+  baseURL: "https://finance-track-u836.onrender.com/api",
   headers: { 'Content-Type': 'application/json' },
 });
 
