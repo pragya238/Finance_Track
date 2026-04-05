@@ -364,3 +364,43 @@ tbody tr:hover {
   transform: translateY(-4px) scale(1.01);
   box-shadow: 0 12px 30px rgba(0,0,0,0.08);
 }
+
+@media (max-width: 768px) {
+  .main-content {
+    padding: 12px;
+  }
+
+  .card {
+    padding: 12px;
+    border-radius: 12px;
+  }
+
+  .stats-grid {
+    gap: 10px;
+  }
+
+  .dashboard-grid {
+    gap: 12px;
+  }
+}
+
+@media (max-width: 768px) {
+  h1 {
+    font-size: 20px;
+  }
+
+  .page-header p {
+    font-size: 13px;
+  }
+
+  .stat-card .value {
+    font-size: 18px;
+  }
+}
+* {
+  max-width: 100%;
+  box-sizing: border-box;
+}
+html {
+  -webkit-text-size-adjust: 100%;
+}
