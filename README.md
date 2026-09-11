@@ -255,3 +255,40 @@ The JWT is returned from `/api/auth/register` and `/api/auth/login`.
 - **Consistent responses**: All endpoints return `{ success, message, data }` via `responseHelper.js`.
 - **Password security**: bcrypt with salt rounds of 12. Password field excluded from queries by default (`select: false`).
 - **MongoDB indexes**: Transactions indexed on `(user, date)`, `(user, type)`, `(user, category)` for fast dashboard aggregations.
+
+
+## Deployment
+
+This repository is a monorepo. Deploy each folder as its own service:
+
+### Backend on Render
+
+The included `render.yaml` sets the backend root directory to `backend`, uses `npm install` and `npm start`, and health-checks `/api/health`.
+
+Add these Render environment variables before deploying:
+
+- `MONGO_URI`: a reachable MongoDB Atlas connection string
+- `JWT_SECRET`: a random secret with at least 32 characters
+- `JWT_EXPIRES_IN`: `7d`
+- `FRONTEND_URLS`: your Vercel URL, for example `https://finance-track-nu.vercel.app`
+
+Do not commit `backend/.env`. It is intentionally ignored; use `backend/.env.example` as the template.
+
+### Frontend on Vercel
+
+The included `vercel.json` builds the React app from `frontend/` and serves the generated `frontend/build` directory.
+
+Set this Vercel environment variable for Production (and Preview if needed):
+
+```
+REACT_APP_API_URL=https://<your-render-service>.onrender.com
+```
+
+The frontend app automatically appends `/api`. After changing an environment variable, trigger a new deployment.
+
+### Authentication troubleshooting
+
+- Open `https://<your-render-service>.onrender.com/api/health`. It should return `status: "OK"` and `database: "connected"`.
+- If the database is disconnected, check `MONGO_URI` and MongoDB Atlas network access.
+- If login returns a network error, check `REACT_APP_API_URL` and that the Render service is running.
+- New public accounts are created as analyst accounts so they can add transactions; admin access is never granted through sign-up.
