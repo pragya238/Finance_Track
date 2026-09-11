@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { authAPI } from '../services/api';
 
 const AuthContext = createContext(null);
@@ -23,6 +23,11 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(readStoredUser);
   const [loading, setLoading] = useState(false);
   const [initializing, setInitializing] = useState(() => Boolean(localStorage.getItem('token')));
+
+  const logout = useCallback(() => {
+    clearStoredSession();
+    setUser(null);
+  }, []);
 
   useEffect(() => {
     let active = true;
@@ -98,11 +103,6 @@ export const AuthProvider = ({ children }) => {
     } finally {
       setLoading(false);
     }
-  };
-
-  const logout = () => {
-    clearStoredSession();
-    setUser(null);
   };
 
   return (
