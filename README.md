@@ -138,7 +138,7 @@ npm start
 
 The app will open at: **http://localhost:3000**
 
-> The `"proxy": "http://localhost:5000"` in `frontend/package.json` routes all `/api/...` calls to the backend automatically.
+> The `"proxy": "http://localhost:5001"` in `frontend/package.json` routes all `/api/...` calls to the backend automatically.
 
 ---
 
