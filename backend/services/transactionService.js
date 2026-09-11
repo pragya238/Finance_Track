@@ -1,20 +1,9 @@
 const Transaction = require('../models/Transaction');
 
-/**
- * Create a new transaction
- */
 const createTransaction = async (userId, transactionData) => {
-  const transaction = await Transaction.create({
-    user: userId,
-    ...transactionData,
-  });
-  return transaction;
+  return Transaction.create({ user: userId, ...transactionData });
 };
 
-/**
- * Get all transactions for a user with optional filters
- * Supports: type, category, startDate, endDate
- */
 const getTransactions = async (userId, filters = {}) => {
   const query = { user: userId };
 
@@ -23,49 +12,28 @@ const getTransactions = async (userId, filters = {}) => {
 
   if (filters.startDate || filters.endDate) {
     query.date = {};
-    if (filters.startDate) query.date.$gte = new Date(filters.startDate);
-    if (filters.endDate) query.date.$lte = new Date(filters.endDate);
+    if (filters.startDate) query.date.$gte = new Date(`${filters.startDate}T00:00:00.000Z`);
+    if (filters.endDate) query.date.$lte = new Date(`${filters.endDate}T23:59:59.999Z`);
   }
 
-  const transactions = await Transaction.find(query)
-    .sort({ date: -1 }) // Most recent first
-    .limit(filters.limit ? parseInt(filters.limit) : 100);
-
-  return transactions;
+  const limit = Math.min(Math.max(parseInt(filters.limit, 10) || 100, 1), 200);
+  return Transaction.find(query).sort({ date: -1 }).limit(limit);
 };
 
-/**
- * Get a single transaction by ID (and verify ownership)
- */
 const getTransactionById = async (transactionId, userId) => {
-  const transaction = await Transaction.findOne({
-    _id: transactionId,
-    user: userId,
-  });
-  return transaction;
+  return Transaction.findOne({ _id: transactionId, user: userId });
 };
 
-/**
- * Update a transaction
- */
 const updateTransaction = async (transactionId, userId, updateData) => {
-  const transaction = await Transaction.findOneAndUpdate(
+  return Transaction.findOneAndUpdate(
     { _id: transactionId, user: userId },
     updateData,
-    { new: true, runValidators: true } // Return updated doc, run validators
+    { new: true, runValidators: true }
   );
-  return transaction;
 };
 
-/**
- * Delete a transaction
- */
 const deleteTransaction = async (transactionId, userId) => {
-  const transaction = await Transaction.findOneAndDelete({
-    _id: transactionId,
-    user: userId,
-  });
-  return transaction;
+  return Transaction.findOneAndDelete({ _id: transactionId, user: userId });
 };
 
 module.exports = {
