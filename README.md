@@ -292,3 +292,10 @@ The frontend app automatically appends `/api`. After changing an environment var
 - If the database is disconnected, check `MONGO_URI` and MongoDB Atlas network access.
 - If login returns a network error, check `REACT_APP_API_URL` and that the Render service is running.
 - New public accounts are created as analyst accounts so they can add transactions; admin access is never granted through sign-up.
+
+
+### Dashboard deployment settings (if you are not using the YAML blueprint)
+
+For an existing Render service set **Root Directory** to `backend`, **Build Command** to `npm install`, and **Start Command** to `npm start`.
+
+For an existing Vercel project leave **Root Directory** at the repository root and set **Install Command** to `npm --prefix frontend install`, **Build Command** to `npm --prefix frontend run build`, and **Output Directory** to `frontend/build`.
