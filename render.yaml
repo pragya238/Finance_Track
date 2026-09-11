@@ -15,3 +15,5 @@ services:
         value: 7d
       - key: FRONTEND_URLS
         value: https://finance-track-nu.vercel.app
+      - key: NODE_ENV
+        value: production
