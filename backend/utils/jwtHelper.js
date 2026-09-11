@@ -1,21 +1,18 @@
 const jwt = require('jsonwebtoken');
 
-/**
- * Generate a signed JWT token for a given user ID
- */
-const generateToken = (userId) => {
-  return jwt.sign(
-    { id: userId },
-    process.env.JWT_SECRET,
-    { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
-  );
+const getSecret = () => {
+  if (!process.env.JWT_SECRET || process.env.JWT_SECRET.length < 32) {
+    throw new Error('JWT_SECRET must be set to a random value of at least 32 characters.');
+  }
+  return process.env.JWT_SECRET;
 };
 
-/**
- * Verify and decode a JWT token
- */
-const verifyToken = (token) => {
-  return jwt.verify(token, process.env.JWT_SECRET);
-};
+const generateToken = (userId) => jwt.sign(
+  { id: String(userId) },
+  getSecret(),
+  { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
+);
+
+const verifyToken = (token) => jwt.verify(token, getSecret());
 
 module.exports = { generateToken, verifyToken };
