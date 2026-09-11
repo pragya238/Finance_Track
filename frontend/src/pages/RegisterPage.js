@@ -3,15 +3,19 @@ import { useAuth } from '../context/AuthContext';
 
 const RegisterPage = ({ onSwitch }) => {
   const { register, loading } = useAuth();
-  const [form, setForm]   = useState({ name:'', email:'', password:'', role:'viewer' });
+  const [form, setForm] = useState({ name: '', email: '', password: '' });
   const [error, setError] = useState('');
 
-  const handleChange = e => setForm({ ...form, [e.target.name]: e.target.value });
+  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
-  const handleSubmit = async e => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    const result = await register(form.name, form.email, form.password, form.role);
+    if (form.password.length < 6) {
+      setError('Password must be at least 6 characters.');
+      return;
+    }
+    const result = await register(form.name, form.email, form.password);
     if (!result.success) setError(result.message);
   };
 
@@ -23,22 +27,24 @@ const RegisterPage = ({ onSwitch }) => {
           FinanceTracker
         </div>
         <h1>Create account</h1>
-        <p>Start tracking your finances</p>
+        <p>Track spending, understand patterns, and make calmer money decisions.</p>
 
-        {error && <div className="alert alert-error">{error}</div>}
+        {error && <div className="alert alert-error" role="alert">{error}</div>}
 
         <form onSubmit={handleSubmit}>
-          <div className="form-group"><label>Full name</label><input name="name" placeholder="Pragya Kashyap" value={form.name} onChange={handleChange} required /></div>
-          <div className="form-group"><label>Email</label><input type="email" name="email" placeholder="you@example.com" value={form.email} onChange={handleChange} required /></div>
-          <div className="form-group"><label>Password</label><input type="password" name="password" placeholder="Min. 6 characters" value={form.password} onChange={handleChange} required /></div>
           <div className="form-group">
-            <label>Role</label>
-            <select name="role" value={form.role} onChange={handleChange}>
-              <option value="viewer">Viewer – Read only</option>
-              <option value="analyst">Analyst – View + Insights</option>
-              <option value="admin">Admin – Full Access</option>
-            </select>
+            <label htmlFor="register-name">Full name</label>
+            <input id="register-name" name="name" placeholder="Pragya Kashyap" value={form.name} onChange={handleChange} autoComplete="name" required />
           </div>
+          <div className="form-group">
+            <label htmlFor="register-email">Email</label>
+            <input id="register-email" type="email" name="email" placeholder="you@example.com" value={form.email} onChange={handleChange} autoComplete="email" required />
+          </div>
+          <div className="form-group">
+            <label htmlFor="register-password">Password</label>
+            <input id="register-password" type="password" name="password" placeholder="At least 6 characters" value={form.password} onChange={handleChange} autoComplete="new-password" minLength="6" required />
+          </div>
+          <div className="auth-note">New accounts can add transactions and view insights. Admin access is granted separately.</div>
           <button type="submit" className="btn btn-primary" disabled={loading}>
             {loading ? <><span className="spinner"></span> Creating...</> : 'Create account'}
           </button>
