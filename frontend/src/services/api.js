@@ -1,9 +1,8 @@
 import axios from 'axios';
 
 const configuredUrl = process.env.REACT_APP_API_URL || 'https://finance-track-u836.onrender.com/api';
-const API_BASE_URL = configuredUrl.replace(/\\/$/, '').endsWith('/api')
-  ? configuredUrl.replace(/\\/$/, '')
-  : `${configuredUrl.replace(/\\/$/, '')}/api`;
+const normalizedUrl = configuredUrl.replace(/\/+$/, '');
+const API_BASE_URL = normalizedUrl.endsWith('/api') ? normalizedUrl : `${normalizedUrl}/api`;
 
 const API = axios.create({
   baseURL: API_BASE_URL,
