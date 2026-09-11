@@ -1,47 +1,44 @@
 const User = require('../models/User');
 const { generateToken } = require('../utils/jwtHelper');
 
-/**
- * Register a new user
- */
+const publicUser = (user) => ({
+  id: String(user._id),
+  name: user.name,
+  email: user.email,
+  role: user.role,
+});
+
 const registerUser = async ({ name, email, password, role }) => {
-  // Check if email already exists
-  const existingUser = await User.findOne({ email });
+  const normalizedEmail = String(email || '').trim().toLowerCase();
+  const existingUser = await User.findOne({ email: normalizedEmail });
   if (existingUser) {
     const error = new Error('Email already in use');
     error.statusCode = 409;
     throw error;
   }
 
-  // Create user (password hashing handled in model pre-save hook)
-  const user = await User.create({ name, email, password, role });
+  // Public sign-up can create viewer or analyst accounts, never admin accounts.
+  const safeRole = role === 'viewer' ? 'viewer' : 'analyst';
+  const user = await User.create({
+    name: String(name || '').trim(),
+    email: normalizedEmail,
+    password,
+    role: safeRole,
+  });
 
-  const token = generateToken(user._id);
-
-  return {
-    token,
-    user: {
-      id: user._id,
-      name: user.name,
-      email: user.email,
-      role: user.role,
-    },
-  };
+  return { token: generateToken(user._id), user: publicUser(user) };
 };
 
-/**
- * Login an existing user
- */
 const loginUser = async ({ email, password }) => {
-  // Find user and explicitly include password for comparison
-  const user = await User.findOne({ email }).select('+password');
+  const normalizedEmail = String(email || '').trim().toLowerCase();
+  const user = await User.findOne({ email: normalizedEmail }).select('+password');
+
   if (!user || !user.isActive) {
     const error = new Error('Invalid email or password');
     error.statusCode = 401;
     throw error;
   }
 
-  // Verify password
   const isMatch = await user.comparePassword(password);
   if (!isMatch) {
     const error = new Error('Invalid email or password');
@@ -49,17 +46,7 @@ const loginUser = async ({ email, password }) => {
     throw error;
   }
 
-  const token = generateToken(user._id);
-
-  return {
-    token,
-    user: {
-      id: user._id,
-      name: user.name,
-      email: user.email,
-      role: user.role,
-    },
-  };
+  return { token: generateToken(user._id), user: publicUser(user) };
 };
 
 module.exports = { registerUser, loginUser };
