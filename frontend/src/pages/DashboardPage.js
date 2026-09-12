@@ -51,9 +51,14 @@ const DashboardPage = ({ onNavigate }) => {
   const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
   const firstName = user?.name?.split(' ')[0] || 'there';
   const hasData = income > 0 || expenses > 0 || recentTransactions.length > 0;
+  const canCreate = ['analyst', 'admin'].includes(user?.role);
+  const pulseHeights = hasData ? [34, 52, 43, 68, 49, 74, 58, 81, 62, 77, 70, 88] : [8, 10, 7, 12, 9, 14, 10, 13, 8, 11, 9, 12];
 
   return (
     <div className="dashboard-page">
+      <div className="dashboard-ambient ambient-one"></div>
+      <div className="dashboard-ambient ambient-two"></div>
+
       <header className="page-header dashboard-header">
         <div className="page-header-left">
           <div className="eyebrow">PERSONAL FINANCE / {new Date().toLocaleDateString('en-IN', { month: 'long', year: 'numeric' }).toUpperCase()}</div>
@@ -61,8 +66,9 @@ const DashboardPage = ({ onNavigate }) => {
           <p>A calmer view of where your money is going.</p>
         </div>
         <div className="header-actions">
-          <div className="period-chip"><span className="status-dot"></span> This month</div>
-          {['analyst', 'admin'].includes(user?.role) && (
+          <div className="sync-status"><span className="status-dot"></span> Synced just now</div>
+          <div className="period-chip"><span className="calendar-glyph">◷</span> This month</div>
+          {canCreate && (
             <button className="btn btn-primary dashboard-add-btn" onClick={() => setShowModal(true)}>
               <span>＋</span> Add transaction
             </button>
@@ -70,39 +76,63 @@ const DashboardPage = ({ onNavigate }) => {
         </div>
       </header>
 
+      <section className="dashboard-hero">
+        <div className="hero-glow"></div>
+        <div className="hero-copy">
+          <div className="hero-label"><span>✦</span> YOUR MONEY, IN ONE CALM PLACE</div>
+          <h2>Every rupee has a story.</h2>
+          <p>{hasData ? 'Keep the rhythm going—small, consistent check-ins make the bigger picture clearer.' : 'Start with one transaction and let your financial picture take shape.'}</p>
+          {!hasData && canCreate && <button className="hero-link" onClick={() => setShowModal(true)}>Add your first record <span>↗</span></button>}
+        </div>
+        <div className="hero-balance">
+          <span>NET MOVEMENT / THIS MONTH</span>
+          <strong>{fmt(balance)}</strong>
+          <small>{hasData ? (savingsRate >= 0 ? 'You are keeping more than you spend.' : 'Expenses are currently ahead.') : 'Waiting for your first signal.'}</small>
+        </div>
+        <div className="hero-orbit" aria-hidden="true">
+          <div className="orbit-ring ring-a"></div>
+          <div className="orbit-ring ring-b"></div>
+          <div className="orbit-core">₹</div>
+          <span className="orbit-star star-a">✦</span>
+          <span className="orbit-star star-b">·</span>
+        </div>
+      </section>
+
       {!hasData && (
         <div className="welcome-banner">
-          <div className="welcome-icon">✦</div>
+          <div className="welcome-icon">＋</div>
           <div>
             <strong>Your financial workspace is ready.</strong>
             <p>Add your first transaction to unlock trends, category breakdowns, and savings signals.</p>
           </div>
-          {['analyst', 'admin'].includes(user?.role) && (
-            <button className="btn btn-secondary" onClick={() => setShowModal(true)}>Add first transaction</button>
-          )}
+          {canCreate && <button className="btn btn-secondary" onClick={() => setShowModal(true)}>Add first transaction</button>}
         </div>
       )}
 
       <section className="stats-grid stats-grid-enhanced" aria-label="Financial summary">
         <article className="stat-card stat-card-featured">
           <div className="stat-card-top"><span className="stat-icon">◒</span><span className="stat-kicker">Available balance</span></div>
-          <div className={'stat-value ' + (balance >= 0 ? 'balance' : 'expense')}>{fmt(balance)}</div>
+          <div className="stat-value balance">{fmt(balance)}</div>
           <div className="stat-meta"><span className="stat-meta-dot"></span> Income minus expenses</div>
+          <div className="stat-decoration decoration-mint"></div>
         </article>
         <article className="stat-card">
           <div className="stat-card-top"><span className="stat-icon income-icon">↗</span><span className="stat-kicker">Total income</span></div>
           <div className="stat-value income">{fmt(income)}</div>
           <div className="stat-meta positive">Money in this month</div>
+          <div className="stat-mini-bars" aria-hidden="true">{pulseHeights.slice(0, 7).map((height, i) => <span key={i} style={{ height: height + '%' }}></span>)}</div>
         </article>
         <article className="stat-card">
           <div className="stat-card-top"><span className="stat-icon expense-icon">↘</span><span className="stat-kicker">Total expenses</span></div>
           <div className="stat-value expense">{fmt(expenses)}</div>
           <div className="stat-meta">Money out this month</div>
+          <div className="stat-mini-bars expense-bars" aria-hidden="true">{pulseHeights.slice(2, 9).map((height, i) => <span key={i} style={{ height: (height * .82) + '%' }}></span>)}</div>
         </article>
         <article className="stat-card">
           <div className="stat-card-top"><span className="stat-icon savings-icon">✦</span><span className="stat-kicker">Savings rate</span></div>
           <div className="stat-value">{savingsRate}%</div>
           <div className={'stat-meta ' + (savingsRate >= 0 ? 'positive' : 'negative')}>{savingsRate >= 0 ? 'Keep the momentum' : 'Review your outgoings'}</div>
+          <div className="stat-ring" aria-hidden="true"><span>{savingsRate}%</span></div>
         </article>
       </section>
 
@@ -114,6 +144,11 @@ const DashboardPage = ({ onNavigate }) => {
           </div>
           <div className="card-body flow-body">
             <div className="flow-total"><strong>{fmt(balance)}</strong><span>net movement</span></div>
+            <div className="flow-chart" aria-hidden="true">
+              <div className="flow-chart-grid"><span></span><span></span><span></span><span></span></div>
+              <div className="flow-bars">{pulseHeights.map((height, i) => <span key={i} style={{ height: height + '%' }}></span>)}</div>
+              {!hasData && <div className="flow-chart-empty"><span>◌</span><strong>Your first pattern starts here</strong><small>Add a record to see cash flow.</small></div>}
+            </div>
             <div className="flow-rows">
               <div className="flow-row">
                 <div className="flow-label"><span className="flow-dot income-dot"></span><span>Income</span><strong>{fmt(income)}</strong></div>
@@ -135,7 +170,12 @@ const DashboardPage = ({ onNavigate }) => {
           </div>
           <div className="card-body category-body">
             {expenseCategories.length === 0 ? (
-              <div className="empty-state compact-empty"><div className="empty-illustration">◌</div><p>Your category breakdown will appear here.</p></div>
+              <div className="category-empty">
+                <div className="empty-donut"><div className="empty-donut-center">₹</div></div>
+                <strong>No spending pattern yet</strong>
+                <p>Your categories will form here as you track expenses.</p>
+                {canCreate && <button className="text-button" onClick={() => setShowModal(true)}>Add an expense <span>→</span></button>}
+              </div>
             ) : (
               expenseCategories.map((item, index) => {
                 const amount = Number(item.total || 0);
