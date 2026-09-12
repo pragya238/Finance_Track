@@ -3,6 +3,7 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import LoginPage        from './pages/LoginPage';
 import RegisterPage     from './pages/RegisterPage';
 import DashboardPage    from './pages/DashboardPage';
+import WidgetPage       from './pages/WidgetPage';
 import TransactionsPage from './pages/TransactionsPage';
 import InsightsPage     from './pages/InsightsPage';
 import UsersPage        from './pages/UsersPage';
@@ -23,6 +24,10 @@ const AppContent = () => {
   const [authView, setAuthView] = useState('login');
   const [activePage, setActivePage] = useState('dashboard');
   const [theme, setTheme] = useState(getInitialTheme);
+  const [widgetMode, setWidgetMode] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    return new URLSearchParams(window.location.search).get('view') === 'widget';
+  });
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
@@ -41,6 +46,12 @@ const AppContent = () => {
 
   const toggleTheme = () => setTheme((current) => current === 'dark' ? 'light' : 'dark');
 
+  const openFullApp = () => {
+    window.history.replaceState({}, '', '/');
+    setWidgetMode(false);
+    setActivePage('dashboard');
+  };
+
   if (initializing) {
     return <div className="loading-screen"><span className="spinner"></span> Restoring your session...</div>;
   }
@@ -49,6 +60,10 @@ const AppContent = () => {
     return authView === 'login'
       ? <LoginPage onSwitch={() => setAuthView('register')} />
       : <RegisterPage onSwitch={() => setAuthView('login')} />;
+  }
+
+  if (widgetMode) {
+    return <WidgetPage onOpenApp={openFullApp} theme={theme} onToggleTheme={toggleTheme} />;
   }
 
   const renderPage = () => {
