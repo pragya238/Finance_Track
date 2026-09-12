@@ -9,6 +9,7 @@ const Sidebar = ({ activePage, onNavigate, theme, onToggleTheme }) => {
   const navItems = [
     { id: 'dashboard', label: 'Dashboard', section: 'Overview', icon: '⌂', roles: ['viewer', 'analyst', 'admin'] },
     { id: 'transactions', label: 'Transactions', section: null, icon: '↗', roles: ['viewer', 'analyst', 'admin'] },
+    { id: 'widget', label: 'Quick widget', section: 'Access', icon: '▣', roles: ['viewer', 'analyst', 'admin'] },
     { id: 'insights', label: 'Insights', section: 'Analytics', icon: '✦', roles: ['analyst', 'admin'] },
     { id: 'users', label: 'Users', section: 'Admin', icon: '◎', roles: ['admin'] },
   ];
@@ -35,7 +36,7 @@ const Sidebar = ({ activePage, onNavigate, theme, onToggleTheme }) => {
               {showSection && <div className="nav-section">{item.section}</div>}
               <button
                 className={'nav-link ' + (activePage === item.id ? 'active' : '')}
-                onClick={() => onNavigate(item.id)}
+                onClick={() => item.id === 'widget' ? window.location.assign('/?view=widget') : onNavigate(item.id)}
               >
                 <span className="nav-icon" aria-hidden="true">{item.icon}</span>
                 <span>{item.label}</span>
