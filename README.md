@@ -299,3 +299,31 @@ The frontend app automatically appends `/api`. After changing an environment var
 For an existing Render service set **Root Directory** to `backend`, **Build Command** to `npm install`, and **Start Command** to `npm start`.
 
 For an existing Vercel project leave **Root Directory** at the repository root and set **Install Command** to `npm --prefix frontend install`, **Build Command** to `npm --prefix frontend run build`, and **Output Directory** to `frontend/build`.
+
+
+---
+
+## Current Vercel experience
+
+The current release is a calm, pastel finance workspace designed for quick daily check-ins.
+
+- **Live dashboard:** https://finance-track-nu.vercel.app/
+- **Quick view:** https://finance-track-nu.vercel.app/?view=widget
+- **Authentication:** JWT login and registration with role-based permissions
+- **Dashboard:** balance, income, expenses, savings rate, cash-flow meters, spending categories, and recent activity
+- **Themes:** light and dark themes, saved per browser
+- **Quick view:** an installable Vercel-hosted PWA for keeping a compact overview one tap away on a phone or laptop
+
+### Install the quick view
+
+Open the quick-view URL in your browser after deployment:
+
+- **Android / Chrome:** browser menu → **Add to Home screen** or **Install app**
+- **iPhone / Safari:** Share → **Add to Home Screen**
+- **Mac / Windows:** Chrome or Edge menu → **Install Finance Tracker**
+
+The quick view is currently a Vercel-hosted installable web app. Native macOS, iOS, and Android OS widgets are not included in this version.
+
+### Production environment
+
+The frontend reads REACT_APP_API_URL and automatically appends /api. Keep backend secrets such as MONGO_URI and JWT_SECRET only in Render environment variables; never commit them to GitHub.
